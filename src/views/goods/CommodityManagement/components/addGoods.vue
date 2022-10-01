@@ -35,7 +35,7 @@
 
 <script>
 export default {
-  name: 'AddGoods1',
+  name: 'AddGoods2',
   props: {
     dialogVisible: {
       type: Boolean,

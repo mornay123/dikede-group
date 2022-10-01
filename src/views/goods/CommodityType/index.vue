@@ -18,8 +18,14 @@
     <el-row>
       <el-col :span="24">
         <div class="grid-content1 bg-top">
-          <!-- 新增按钮弹出层 -->
-          <add-goods />
+          <!-- 新增按钮 -->
+          <el-button
+            icon="el-icon-circle-plus-outline"
+            style="background-color:#ff8a3b;color:#fff"
+            @click="handleAdd"
+          >
+            新增
+          </el-button>
 
           <el-table
             :data="tableData"
@@ -56,7 +62,8 @@
         </div>
       </el-col>
     </el-row>
-
+    <!-- 新增按钮弹出层 -->
+    <add-goods :dialog-visible.sync="dialogVisible" />
   </div>
 </template>
 
@@ -68,6 +75,7 @@ export default {
   components: { addGoods },
   data() {
     return {
+      dialogVisible: false,
       tableData: [{
         date: 1,
         name: '王小虎',
@@ -90,6 +98,9 @@ export default {
     },
     handleDelete(index, row) {
       console.log(index, row)
+    },
+    handleAdd() {
+      this.dialogVisible = true
     }
   }
 }
