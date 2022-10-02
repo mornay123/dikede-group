@@ -1,5 +1,5 @@
 <template>
-  <div>111</div>
+  <div class="equipmentState">设备状态</div>
 </template>
 
 <script>
@@ -9,5 +9,7 @@ export default {
 </script>
 
 <style>
-
+.equipmentState {
+  margin-top: 60px;
+}
 </style>
