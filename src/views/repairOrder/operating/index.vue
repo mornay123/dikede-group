@@ -5,12 +5,16 @@
     <el-row class="content">
       <!-- 按钮 -->
       <el-row class="btn">
-        <el-button type="primary" icon="el-icon-circle-plus-outline" class="build">新建</el-button>
-        <el-button class="setting">工单配置</el-button>
+        <el-button type="primary" icon="el-icon-circle-plus-outline" class="build" @click="isShowBuild=true">新建</el-button>
+        <el-button class="setting" @click="isShowConfig=true">工单配置</el-button>
       </el-row>
       <!-- 表格 -->
       <Table :table-list="tableList" :total-count="totalCount" :total-page="totalPage" :page-index="pageIndex" @prev="prev" @next="next" />
     </el-row>
+    <!-- 工单配置弹框 -->
+    <repair-order-config :is-show-config="isShowConfig" @closeConfig="isShowConfig=false" />
+    <!-- 新建的弹框 -->
+    <add-repair-order :is-show-build="isShowBuild" @closeBuild="isShowBuild=false" />
   </div>
 </template>
 
@@ -18,11 +22,15 @@
 import search from '../components/search.vue'
 import Table from '../components/table.vue'
 import { getRepairOrderStatusList, repairOrderSearchList } from '@/api/repairOrder'
+import RepairOrderConfig from '../components/repairOrderConfig.vue'
+import AddRepairOrder from '../components/addRepairOrder.vue'
 
 export default {
-  components: { search, Table },
+  components: { search, Table, RepairOrderConfig, AddRepairOrder },
   data() {
     return {
+      isShowConfig: false,
+      isShowBuild: false,
       repairOrderStatusList: [],
       tableList: [],
       totalCount: 0,
