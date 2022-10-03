@@ -65,9 +65,12 @@ export default {
         const res = await setStrategy(data)
         if (res.data) {
           this.searchStrategy()
+          this.$message.success('添加成功')
         }
       } catch (e) {
-        console.log(e)
+        if (e.response.status === 500) {
+          this.$message.error('添加失败，已存在此名称的对象')
+        }
       }
     },
     async searchStrategy() {
@@ -87,11 +90,11 @@ export default {
     },
     prev() {
       this.params.pageIndex--
-      this.getRepairOrderSearchList()
+      this.searchStrategy()
     },
     next() {
       this.params.pageIndex++
-      this.getRepairOrderSearchList()
+      this.searchStrategy()
     },
     search(data) {
       this.params.policyName = data
@@ -115,5 +118,5 @@ export default {
     }
   }
 }
-</style>>
+</style>
 
