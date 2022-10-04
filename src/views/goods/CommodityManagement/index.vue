@@ -6,8 +6,8 @@
         <div class="grid-content bg-top">
           <div class="search">
             <span style="padding-right: 15px">商品类型搜索 : </span>
-            <input type="text" placeholder="请输入" autocomplete="off" class="searchInput">
-            <el-button type="primary" icon="el-icon-search" class="searchBtn">
+            <input v-model="search" type="text" placeholder="请输入" autocomplete="off" class="searchInput">
+            <el-button type="primary" icon="el-icon-search" class="searchBtn" @click="searchGoods">
               <span style="padding-left:4px">查询</span>
             </el-button>
           </div>
@@ -26,8 +26,16 @@
           >
             新增
           </el-button>
+          <!-- 导入数据 按钮 -->
+          <el-button
+            style="background-color:#f3e7e1;color:#000"
+            @click="handleImport"
+          >
+            导入数据
+          </el-button>
 
           <el-table
+            v-loading="loading"
             :data="tableData"
             style="width: 100%"
           >
@@ -38,48 +46,51 @@
               width="120"
             />
             <el-table-column
-              prop="name"
+              prop="skuName"
               label="商品名称"
               width="160"
             />
             <el-table-column
-              prop="name"
+              prop="skuImage"
               label="商品图片"
               width="160"
-            />
+            >
+              <template slot-scope="{row}">
+                <img :src="row.skuImage" alt="" style="width:24px;height:24px">
+              </template>
+            </el-table-column>
             <el-table-column
-              prop="name"
+              prop="brandName"
               label="品牌"
               width="160"
             />
             <el-table-column
-              prop="name"
+              prop="unit"
               label="规格"
               width="160"
             />
             <el-table-column
-              prop="name"
+              prop="price"
               label="商品价格"
               width="160"
             />
             <el-table-column
-              prop="name"
+              prop="skuClass.className"
               label="商品类型"
               width="160"
             />
             <el-table-column
-              prop="name"
+              prop="createTime"
               label="创建日期"
               width="160"
             />
             <el-table-column
-              prop="address"
               label="操作"
             >
-              <template slot-scope="scope">
+              <template slot-scope="{row}">
                 <span
                   style="color:blue"
-                  @click="handleEdit(scope.$index, scope.row)"
+                  @click="handleEdit(row)"
                 >修改</span>
               </template>
             </el-table-column>
@@ -87,44 +98,109 @@
         </div>
       </el-col>
     </el-row>
-    <add-goods :dialog-visible.sync="dialogVisible" />
+    <!-- 新增/修改 弹窗 -->
+    <add-goods
+      ref="refManageGoods"
+      :dialog-visible.sync="dialogVisible"
+      @refleshList="manageAllGoods"
+    />
+    <!-- 导入数据弹窗 -->
+    <import-goods
+      ref="refImportGoods"
+      :dialog-visible2.sync="dialogVisible2"
+      @refleshList="manageAllGoods"
+    />
+
+    <div class="block">
+      <span class="demonstration">共{{ total }}条记录  第 {{ num1 }}/{{ num2 }} 页</span>
+      <span class="btn">
+        <el-button ref="prevBtn" class="left">上一页</el-button>
+        <el-button class="right" @click="pageNext">下一页</el-button>
+      </span>
+    </div>
   </div>
 </template>
 
 <script>
-import { getAllGoods } from '@/api/goods'
+import { manageAllGoods } from '@/api/goods'
 import addGoods from './components/addGoods.vue'
+import importGoods from './components/importGoods.vue'
 export default {
   name: 'GoodsManagement',
-  components: { addGoods },
+  components: { addGoods, importGoods },
   data() {
     return {
-      tableData: [{
-        date: 1,
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      },
-      {
-        date: 1,
-        name: '王小小',
-        address: '上海市普陀区'
-      }],
-      dialogVisible: false
+      tableData: [
+        {
+          skuName: '', // 商品名称
+          skuImage: '', // 商品图片
+          brandName: '', // 品牌
+          unit: '', // 规格
+          price: '', // 价格
+          skuClass: '', // 商品类型
+          createTime: '' // 创建日期
+        }
+      ],
+      search: '',
+      pageIndex: 1,
+      pageSize: 10,
+      dialogVisible: false,
+      dialogVisible2: false,
+      total: 0,
+      loading: false,
+      classId: ''
     }
   },
+  computed: {
+    num1() {
+      return Math.ceil(this.total / 10)
+    },
+    num2() {
+      return Math.floor(this.total / 10)
+    }
+  },
+  created() {
+    this.manageAllGoods()
+  },
   methods: {
-    async getAllGoods() {
-      const data = await getAllGoods(this.tableData.name)
-      console.log(data)
+    async manageAllGoods() { // 获取所有商品
+      try {
+        this.loading = true
+        const { data } = await manageAllGoods(this.pageIndex, this.pageSize, this.tableData.skuName)
+        console.log(data.currentPageRecords)
+        this.tableData = data.currentPageRecords
+        this.total = data.currentPageRecords.length
+        this.classId = data.currentPageRecords.classId
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.loading = false // 关闭加载中
+      }
     },
-    handleEdit(index, row) {
-      console.log(index, row)
+    searchGoods() { // 搜索框
+      if (this.search.trim) {
+        this.tableData = this.tableData.filter(item => item.skuName === this.search)
+        this.getAllGoods()
+      } else {
+        this.getAllGoods()
+      }
     },
-    handleDelete(index, row) {
-      console.log(index, row)
+    handleEdit(row) { // 修改按钮
+      console.log(row)
+      this.$refs.refManageGoods.tableData = { ...row }
+      this.dialogVisible = true // 显示弹出层
     },
-    handleAdd() {
+    pageNext() { // 下一页按钮
+      console.log(this.pageIndex)
+      this.pageIndex = this.pageIndex + 1
+      console.log(this.pageIndex)
+      this.getAllGoods()
+    },
+    handleAdd() { // 新增
       this.dialogVisible = true
+    },
+    handleImport() { // 导入数据
+      this.dialogVisible2 = true
     }
   }
 }
@@ -182,5 +258,17 @@ export default {
     padding: 10px 0;
     background-color: #f9fafc;
   }
+
+  // 下一页按钮
+  .block{
+  display: flex;
+  justify-content: space-between;
+}
+.btn{
+  margin-right: 40px;
+}
+.demonstration{
+  color: #dbdfe5;
+}
 </style>
 

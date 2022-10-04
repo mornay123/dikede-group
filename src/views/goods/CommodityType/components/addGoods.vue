@@ -15,7 +15,7 @@
         <el-form-item
           prop="className"
           label="商品类型名称"
-          :rules="[{required: true, message:'角色名称必填'}]"
+          :rules="[{required: true, message:'角色名称必填',trigger: 'blur'}]"
         >
           <el-input
             v-model="formData.className"
@@ -34,6 +34,7 @@
 </template>
 
 <script>
+import { addGoods, editGoods } from '@/api/goods'
 export default {
   name: 'AddGoods1',
   props: {
@@ -46,15 +47,26 @@ export default {
     return {
       formData: {
         className: '' // 商品类型名称
-      }
+      },
+      pageIndex: 1,
+      pageSize: 10
     }
   },
   methods: {
     handleClose() {
       this.$emit('update:dialogVisible', false)
+      this.$refs.roleDialogForm.resetFields() // 重置表单
+      this.formData = { className: '' }
     },
-    submit() {
-      console.log('submit')
+    async submit() {
+      await this.$refs.roleDialogForm.validate()
+      this.formData.classId ? await editGoods(this.formData) : await addGoods(this.formData)
+      this.$message.success(this.formData.classId ? '修改成功' : '新增成功')
+
+      // this.$emit('update:className', this.formData.className)
+      this.$message.success('新增成功')
+      this.$emit('refleshList') // 新增完之后重新刷新,即再调用获取角色的接口,让父亲改
+      this.handleClose()
     }
   }
 }

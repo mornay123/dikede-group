@@ -6,8 +6,8 @@
         <div class="grid-content bg-top">
           <div class="search">
             <span style="padding-right: 15px">商品类型搜索 : </span>
-            <input type="text" placeholder="请输入" autocomplete="off" class="searchInput">
-            <el-button type="primary" icon="el-icon-search" class="searchBtn">
+            <input v-model="search" type="text" placeholder="请输入" autocomplete="off" class="searchInput">
+            <el-button type="primary" icon="el-icon-search" class="searchBtn" @click="searchGoods">
               <span style="padding-left:4px">查询</span>
             </el-button>
           </div>
@@ -38,7 +38,7 @@
               width="120"
             />
             <el-table-column
-              prop="name"
+              prop="className"
               label="商品类型名称"
               width="1330"
             />
@@ -46,15 +46,15 @@
               prop="address"
               label="操作"
             >
-              <template slot-scope="scope">
+              <template slot-scope="{row}">
                 <span
                   style="color:blue"
-                  @click="handleEdit(scope.$index, scope.row)"
+                  @click="handleEdit(row)"
                 >修改</span>
                 <span
                   size="mini"
                   style="color:red;padding-left:10px"
-                  @click="handleDelete(scope.$index, scope.row)"
+                  @click="handleDelete(row.classId)"
                 >删除</span>
               </template>
             </el-table-column>
@@ -63,12 +63,41 @@
       </el-col>
     </el-row>
     <!-- 新增按钮弹出层 -->
-    <add-goods :dialog-visible.sync="dialogVisible" />
+    <add-goods
+      ref="refGoods"
+      :dialog-visible.sync="dialogVisible"
+      @refleshList="getAllGoods"
+    />
+
+    <div class="block">
+      <span class="demonstration">共{{ total }}条记录  第 {{ num1 }}/{{ num2 }} 页</span>
+      <!-- <el-pagination
+        v-if="total>0"
+        layout="prev, pager, next,sizes"
+        background
+        :total="total"
+        :current-page.sync="pageIndex"
+        :page-size.sync="pageSize"
+        @current-change="getAllGoods"
+        @size-change="getAllGoods"
+      /> -->
+      <!-- <el-pagination
+        :disabled="false"
+        :total="total"
+        layout="prev,pager, next"
+        @current-change="getAllGoods"
+        @size-change="getAllGoods"
+      /> -->
+      <span class="btn">
+        <el-button ref="prevBtn" class="left">上一页</el-button>
+        <el-button class="right" @click="pageNext">下一页</el-button>
+      </span>
+    </div>
   </div>
 </template>
 
 <script>
-import { getAllGoods } from '@/api/goods'
+import { getAllGoods, delGoods } from '@/api/goods'
 import addGoods from './components/addGoods.vue'
 export default {
   name: 'GoodsType',
@@ -76,28 +105,71 @@ export default {
   data() {
     return {
       dialogVisible: false,
-      tableData: [{
-        date: 1,
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      },
-      {
-        date: 1,
-        name: '王小小',
-        address: '上海市普陀区'
-      }]
+      tableData: [{ className: '' }],
+      pageIndex: 1,
+      pageSize: 10,
+      search: '',
+      currentPage1: 5,
+      value: true,
+      total: 0
     }
+  },
+  computed: {
+    num1() {
+      return Math.ceil(this.total / 10)
+    },
+    num2() {
+      return Math.floor(this.total / 10)
+    }
+  },
+  created() {
+    this.getAllGoods()
   },
   methods: {
     async getAllGoods() {
-      const data = await getAllGoods(this.tableData.name)
-      console.log(data)
+      try {
+        const { data } = await getAllGoods(this.pageIndex, this.pageSize, this.tableData.className)
+        console.log(data.currentPageRecords)
+
+        this.tableData = data.currentPageRecords
+        this.total = data.currentPageRecords.length
+      } catch (error) {
+        console.log(error)
+      }
     },
-    handleEdit(index, row) {
-      console.log(index, row)
+    searchGoods() {
+      if (this.search) {
+        this.tableData = this.tableData.filter(item => item.className === this.search)
+        this.getAllGoods()
+      } else {
+        this.getAllGoods()
+      }
     },
-    handleDelete(index, row) {
-      console.log(index, row)
+    pageNext() {
+      this.pageIndex = this.pageIndex + 1
+      this.getAllGoods()
+    },
+
+    // handleSizeChange(val) {
+    //   console.log(`每页 ${val} 条`)
+    // },
+    // handleCurrentChange(val) {
+    //   console.log(`当前页: ${val}`)
+    // },
+
+    handleEdit(row) { // 修改
+      console.log('修改', row)
+      this.$refs.refGoods.formData = { ...row }
+      this.dialogVisible = true
+    },
+    async handleDelete(classId) { // 删除
+      await this.$confirm('确认删除吗', '删除提示', {
+        cancelButtonText: '取消',
+        confirmButtonText: '确定',
+        type: 'warning'
+      })
+      await delGoods(classId)
+      this.getAllGoods()
     },
     handleAdd() {
       this.dialogVisible = true
@@ -158,5 +230,16 @@ export default {
     padding: 10px 0;
     background-color: #f9fafc;
   }
+// 下一页按钮
+  .block{
+  display: flex;
+  justify-content: space-between;
+}
+.btn{
+  margin-right: 40px;
+}
+.demonstration{
+  color: #dbdfe5;
+}
 </style>
 

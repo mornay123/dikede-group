@@ -1,10 +1,11 @@
 <template>
-  <div>区域</div>
+  <div>
+    123
+  </div>
 </template>
 
 <script>
 export default {
-
 }
 </script>
 
