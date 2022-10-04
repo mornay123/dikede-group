@@ -21,7 +21,7 @@
         width="100"
       >
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="handleClick(scope.row)">查看详情</el-button>
+          <el-button type="text" size="large" @click="detail(scope.row)">查看详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -39,11 +39,15 @@
         @next-click="$emit('next',pageIndex)"
       />
     </div>
+    <!-- 查看详情弹框 -->
+    <detail :isshow-detail="isShow" :curr-detail-data="currDetailData" @closeDetail="isShow=false" />
   </div>
 </template>
 
 <script>
+import detail from './detail.vue'
 export default {
+  components: { detail },
   props: {
     tableList: {
       type: Array,
@@ -66,9 +70,21 @@ export default {
       default: 0
     }
   },
+  data() {
+    return {
+      isShow: false,
+      currDetailData: {}
+    }
+  },
   computed: {
     isShowPage() {
       return this.tableList.length >= 10
+    }
+  },
+  methods: {
+    detail(data) {
+      this.isShow = true
+      this.currDetailData = data
     }
   }
 }
