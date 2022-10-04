@@ -9,7 +9,7 @@
         <el-button class="setting" @click="isShowConfig=true">工单配置</el-button>
       </el-row>
       <!-- 表格 -->
-      <Table :table-list="tableList" :total-count="totalCount" :total-page="totalPage" :page-index="pageIndex" @prev="prev" @next="next" />
+      <Table :table-list="tableList" :table-header="tableHeader" :total-count="totalCount" :total-page="totalPage" :page-index="pageIndex" @prev="prev" @next="next" />
     </el-row>
     <!-- 工单配置弹框 -->
     <repair-order-config :is-show-config="isShowConfig" @closeConfig="isShowConfig=false" />
@@ -42,7 +42,37 @@ export default {
         isRepair: false,
         taskCode: '',
         status: ''
-      }
+      },
+      tableHeader: [
+        {
+          label: '工单编号',
+          prop: 'taskCode'
+        },
+        {
+          label: '设备编号',
+          prop: 'innerCode'
+        },
+        {
+          label: '工单类型',
+          prop: 'taskType.typeName'
+        },
+        {
+          label: '工单方式',
+          prop: 'createType'
+        },
+        {
+          label: '工单状态',
+          prop: 'taskStatusTypeEntity.statusName'
+        },
+        {
+          label: '运营人员',
+          prop: 'userName'
+        },
+        {
+          label: '创建日期',
+          prop: 'createType'
+        }
+      ]
     }
   },
   created() {

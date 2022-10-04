@@ -10,33 +10,11 @@
         width="80"
       />
       <el-table-column
-        prop="taskCode"
-        label="工单编号"
+        v-for="(item,index) in tableHeader"
+        :key="index"
+        :prop="item.prop"
+        :label="item.label"
         width="132"
-      />
-      <el-table-column
-        prop="innerCode"
-        label="设备编号"
-      />
-      <el-table-column
-        prop="taskType.typeName"
-        label="工单类型"
-      />
-      <el-table-column
-        prop="createType"
-        label="工单方式"
-      />
-      <el-table-column
-        prop="taskStatusTypeEntity.statusName"
-        label="工单状态"
-      />
-      <el-table-column
-        prop="userName"
-        label="运营人员"
-      />
-      <el-table-column
-        prop="createTime"
-        label="创建日期"
       />
       <el-table-column
         label="操作"
@@ -68,6 +46,10 @@
 export default {
   props: {
     tableList: {
+      type: Array,
+      default: () => { [] }
+    },
+    tableHeader: {
       type: Array,
       default: () => { [] }
     },

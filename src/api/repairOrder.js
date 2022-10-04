@@ -44,3 +44,58 @@ export const setWarningValue = (alertValue) => {
     data: { alertValue }
   })
 }
+
+/**
+ * 根据设备编号获取运营人员列表
+ * @param {*} innerCode 设备编号
+ * @returns
+ */
+export const getOperatorList = (innerCode) => {
+  return request({
+    url: `/user-service/user/operatorList/${innerCode}`
+  })
+}
+
+/**
+ * 获取补货详情列表
+ * @param {*} innerCode
+ * @returns
+ */
+export const getBuHuoDetailList = (innerCode) => {
+  return request({
+    url: `vm-service/channel/channelList/${innerCode}`
+  })
+}
+
+/**
+ * 获取所有工单类型
+ * @returns
+ */
+export const getAllOrderType = () => {
+  return request({
+    url: '/task-service/taskType/list'
+  })
+}
+
+/**
+ * 获取维修人员列表
+ * @param {*} innerCode 设备编号
+ * @returns
+ */
+export const getRepairerList = (innerCode) => {
+  return request({
+    url: `/user-service/user/repairerList/${innerCode}`
+  })
+}
+
+/**
+ * 创建工单
+ * @returns
+ */
+export const createOrder = (data) => {
+  return request({
+    url: '/task-service/task/create',
+    method: 'POST',
+    data
+  })
+}

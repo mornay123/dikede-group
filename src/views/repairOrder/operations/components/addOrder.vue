@@ -9,7 +9,7 @@
     <el-form ref="ruleForm" class="demo-ruleForm form" :rules="ruleForm" :model="formdata" label-width="140px">
       <el-form-item label="设备编号：" prop="innerCode">
         <el-input
-          v-model="formdata.innerCode"
+          v-model.trim="formdata.innerCode"
           placeholder="请输入"
           maxlength="15"
           show-word-limit
@@ -18,13 +18,10 @@
       </el-form-item>
       <el-form-item label="工单类型：" prop="productType">
         <el-select v-model="formdata.productType" placeholder="请选择">
-          <el-option label="补货工单" value="2" />
+          <el-option v-for="item in allOrderType" :key="item.typeId" :label="item.typeName" :value="item.typeId" />
         </el-select>
       </el-form-item>
-      <el-form-item label="补货数量：">
-        <el-button icon="el-icon-edit-outline" type="text" @click="buHuoList">补货清单</el-button>
-      </el-form-item>
-      <el-form-item label="运营人员：" prop="userId">
+      <el-form-item label="运维人员：" prop="userId">
         <el-select v-model="formdata.userId" placeholder="请选择">
           <el-option v-for="item in operatorList" :key="item.userId" :label="item.userName" :value="item.userId" />
         </el-select>
@@ -43,17 +40,13 @@
       <el-button class="cancel" @click="closeBuild">取 消</el-button>
       <el-button class="determine" type="primary" @click="confirm">确 定</el-button>
     </span>
-    <!-- 补货详情的弹窗 -->
-    <bu-huo-detail :inner-code="formdata.innerCode" :is-show-bu-huo="isShowBuHuo" @closeBuHuo="isShowBuHuo=false" />
   </el-dialog>
 </template>
 
 <script>
-import { getOperatorList } from '@/api/repairOrder'
-import buHuoDetail from './buHuoDetail.vue'
+import { getRepairerList, getAllOrderType, createOrder } from '@/api/repairOrder'
 
 export default {
-  components: { buHuoDetail },
   props: {
     isShowBuild: {
       type: Boolean,
@@ -68,8 +61,7 @@ export default {
         innerCode: '', // 设备编号
         userId: '',
         productType: '',
-        desc: '',
-        details: {}
+        desc: ''
       },
       ruleForm: {
         innerCode: [{ required: true, message: '请输入' }],
@@ -77,22 +69,36 @@ export default {
         userId: [{ required: true, message: '请输入' }],
         desc: [{ required: true, message: '请输入' }]
       },
-      operatorList: []
+      operatorList: [],
+      allOrderType: []
     }
+  },
+  created() {
+    this.getAllOrderType()
   },
   methods: {
     async innerCodeChange() {
       try {
         this.operatorList = []
-        const { data } = await getOperatorList(this.formdata.innerCode)
+        const { data } = await getRepairerList(this.formdata.innerCode)
+        console.log(data)
         this.operatorList = data
       } catch (e) {
         console.log(e)
       }
     },
-    buHuoList() {
-      if (this.formdata.innerCode) {
-        this.isShowBuHuo = true
+    async getAllOrderType() {
+      try {
+        this.operatorList = []
+        const { data } = await getAllOrderType()
+        console.log(data)
+        data.forEach(item => {
+          if (item.type === 1) {
+            this.allOrderType.push(item)
+          }
+        })
+      } catch (e) {
+        console.log(e)
       }
     },
     closeBuild() {
@@ -100,8 +106,16 @@ export default {
       this.$emit('closeBuild')
     },
     async confirm() {
-      await this.$refs.ruleForm.validate()
-      this.closeBuild()
+      try {
+        await this.$refs.ruleForm.validate()
+        await createOrder(this.formdata)
+        this.$message.success('新建成功')
+        this.closeBuild()
+      } catch (e) {
+        if (e.response && e.response.status === 500) {
+          this.$message.error(e.response.data)
+        }
+      }
     }
   }
 
