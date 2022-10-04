@@ -1,11 +1,13 @@
 <template>
   <div>
-    123
+    <AccountStats />
   </div>
 </template>
 
 <script>
+import AccountStats from './AccountStats'
 export default {
+  components: { AccountStats }
 }
 </script>
 
