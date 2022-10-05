@@ -113,8 +113,8 @@ export default {
 
 <style lang="scss" scoped>
 .dashboard-container {
-  margin-top: 60px;
-  padding: 20px;
+  // margin-top: 60px;
+  // padding: 20px;
 
   .dashboard-top {
     margin-bottom: 20px;
