@@ -7,7 +7,7 @@
           <p class="blue-title">日销售统计</p>
           <div class="bills">
             <span class="bills-flex">
-              <div class="bills-total">1</div>
+              <div class="bills-total">0</div>
               <div class="bills-count">当日销售量 (个)</div>
             </span>
             <span class="bills-flex">
@@ -50,8 +50,11 @@
           <el-form ref="form" :model="form" label-width="80px" style="display:flex;padding-top:20px;font-size: 18px">
             <el-form-item label="合作商 :">
               <el-select v-model="form.region" placeholder="请选择">
-                <el-option label="区域一" value="shanghai" />
-                <el-option label="区域二" value="beijing" />
+                <el-option label="金燕龙合作商" value="shanghai" />
+                <el-option label="天华物业" value="tianhua" />
+                <el-option label="金燕龙物业" value="jin" />
+                <el-option label="合作商开发-勿删" value="kaifa" />
+                <el-option label="北京合作商" value="beijing" />
               </el-select>
             </el-form-item>
 
@@ -67,13 +70,47 @@
               </span>
             </el-form-item>
           </el-form>
-
-          <div>
-            <span>笔数统计 : 1433 个</span>
-            <span>收入统计 : 5615.99 元</span>
-            <span>分成统计 : 7.16 元</span>
+          <!-- 统计 -->
+          <div class="middleCount">
+            <span>笔数统计 : <span class="count">1433</span> <span class="unit">个</span></span>
+            <span>收入统计 : <span class="count">5615.99</span> <span class="unit">元</span></span>
+            <span>分成统计 : <span class="count">7.16</span> <span class="unit">元</span></span>
           </div>
 
+          <!-- 表格 -->
+          <el-table
+            class="tableTable"
+            :data="tableData"
+            style="width: 100%"
+            :highlight-current-row="true"
+          >
+            <el-table-column
+              prop="date"
+              label="订单日期"
+              width="180"
+            />
+            <el-table-column
+              prop="ownerName"
+              label="合作商"
+              width="180"
+            />
+            <el-table-column
+              prop="ratio"
+              label="分成比例"
+            />
+            <el-table-column
+              prop="orderTotalMoney"
+              label="收入(元)"
+            />
+            <el-table-column
+              prop="orderCount"
+              label="笔数"
+            />
+            <el-table-column
+              prop="totalBill"
+              label="分成金额(元)"
+            />
+          </el-table>
         </div>
       </el-col>
     </el-row>
@@ -81,6 +118,8 @@
 </template>
 
 <script>
+import dayjs from 'dayjs'
+import { partnerCollect } from '@/api/reconciliation'
 export default {
   data() {
     return {
@@ -89,11 +128,63 @@ export default {
         date1: '',
         date2: ''
       },
-      value: ''
+      value: '2022-10-01',
+      tableData: [{
+        date: '2022-10-01',
+        ownerName: '金燕龙合作商',
+        ratio: '15%',
+        orderTotalMoney: '+1872.95',
+        orderCount: '444',
+        totalBill: '+2.39'
+      },
+      {
+        date: '2022-10-02',
+        ownerName: '金燕龙合作商',
+        ratio: '15%',
+        orderTotalMoney: '+2028.39',
+        orderCount: '449',
+        totalBill: '+2.68'
+      },
+      {
+        date: '2022-10-03',
+        ownerName: '金燕龙合作商',
+        ratio: '15%',
+        orderTotalMoney: '+1714.65',
+        orderCount: '536',
+        totalBill: '+2.09'
+      },
+      {
+        date: '2022-10-04',
+        ownerName: '金燕龙合作商',
+        ratio: '15%',
+        orderTotalMoney: '+1872.95',
+        orderCount: '444',
+        totalBill: '+2.39'
+      },
+      {
+        date: '2022-10-05',
+        ownerName: '金燕龙合作商',
+        ratio: '15%',
+        orderTotalMoney: '+5852.9',
+        orderCount: '445',
+        totalBill: '+8.54'
+      }],
+      pageIndex: 1,
+      pageSize: 10,
+      start: dayjs(new Date().setDate(1)).format('YYYY-MM-DD'),
+      end: dayjs(new Date()).format('YYYY-MM-DD')
+      // start: '2022-10-01',
+      // end: '2022-10-05'
     }
   },
+  created() {
+    this.partnerCollect()
+  },
   methods: {
-
+    async partnerCollect() {
+      const data = await partnerCollect(this.start + ' 00:00:00', this.end + ' 23:59:59', this.pageIndex, this.pageSize)
+      console.log(data)
+    }
   }
 }
 </script>
@@ -187,6 +278,34 @@ export default {
 // 表格
 .search{
   background-color: #fff;
+}
+
+// 统计
+.middleCount{
+  padding: 15px;
+  .count{
+    color:#ff5757;
+    font-weight: 700;
+    font-size: 20px;
+    padding-left: 5px;
+  }
+  .unit{
+    font-size: 14px;
+    padding-right: 45px;
+  }
+}
+
+// 表格
+.tableTable{
+  // font-weight: normal;
+  // background-color: #f3f6fb;
+  padding-left: 15px;
+  // tr{
+  //   background-color: #f3f6fb;
+  // }
+  thead{
+    background-color: #f3f6fb;
+  }
 }
 
 </style>

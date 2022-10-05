@@ -10,7 +10,7 @@ export const getAllGoods = (params) => {
   })
 }
 
-// 新增shang商品
+// 新增商品
 export const addGoods = (data) => {
   return request({
     url: '/vm-service/skuClass',
