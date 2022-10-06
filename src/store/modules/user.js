@@ -1,12 +1,14 @@
 import router from '@/router'
 import { loginAPI } from '@/api/login'
 import { getUserInfoAPI } from '@/api/user'
+// import { getNumberListsAPI } from '@/api/equipments'
 import { Message } from 'element-ui'
 const state = {
   token: null,
   userInfo: {},
   userId: '',
   hrsaasTime: 0
+  // innerList: ''
 }
 const mutations = {
   SET_TOKEN(state, token) {
@@ -21,6 +23,7 @@ const mutations = {
   },
   SET_USER_INFO(state, userInfo) {
     state.userInfo = userInfo
+    // state.userId = userInfo.userId
   },
   REMOVE_USER_INFO(state) {
     state.userInfo = {}
@@ -28,11 +31,15 @@ const mutations = {
   SET_HRSAASTIME(state, time) {
     state.hrsaasTime = time
   }
+  // SET_NUMBER_LIST(state, innerList) {
+  //   state.innerList = innerList
+  // }
 }
 const actions = {
   async loginActions({ commit }, data) {
     try {
       const res = await loginAPI(data)
+
       if (!res.data.success) return Message.error(res.data.msg)
       Message.success(res.data.msg)
       commit('SET_TOKEN', res.data.token)
@@ -49,6 +56,14 @@ const actions = {
     // console.log(res)
     context.commit('SET_USER_INFO', res.data)
   },
+  // 售货机编号
+  // async getNumberings(context) {
+  //   console.log(context.state.userId)
+  //   const res = await getNumberListsAPI(context.state.userId)
+  //   // console.log(res)
+  //   context.commit('SET_NUMBER_LIST', res.data)
+  //   console.log(res, '编号')
+  // },
   // 登出
   logout({ commit }) {
     commit('REMOVE_TOKEN')
