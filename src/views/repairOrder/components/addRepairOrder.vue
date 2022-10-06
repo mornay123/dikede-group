@@ -69,7 +69,7 @@ export default {
         userId: '',
         productType: '',
         desc: '',
-        details: {}
+        details: []
       },
       ruleForm: {
         innerCode: [{ required: true, message: '请输入' }],

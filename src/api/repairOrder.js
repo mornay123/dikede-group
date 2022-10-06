@@ -99,3 +99,26 @@ export const createOrder = (data) => {
     data
   })
 }
+
+/**
+ * 取消工单
+ * @returns
+ */
+export const delOrder = (taskId, data) => {
+  return request({
+    url: `/task-service/task/cancel/${taskId}`,
+    method: 'POST',
+    data
+  })
+}
+
+/**
+ * 补货详情
+ * @param {*} innerCode
+ * @returns
+ */
+export const searchBuHuoDetail = (taskId) => {
+  return request({
+    url: `task-service/taskDetails/${taskId}`
+  })
+}

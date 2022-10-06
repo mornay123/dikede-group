@@ -91,7 +91,7 @@ export default {
       try {
         this.operatorList = []
         const { data } = await getAllOrderType()
-        console.log(data)
+        // console.log(data)
         data.forEach(item => {
           if (item.type === 1) {
             this.allOrderType.push(item)

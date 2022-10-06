@@ -9,7 +9,7 @@
         <el-button class="setting" @click="isShowConfig=true">工单配置</el-button>
       </el-row>
       <!-- 表格 -->
-      <Table :table-list="tableList" :table-header="tableHeader" :total-count="totalCount" :total-page="totalPage" :page-index="pageIndex" @prev="prev" @next="next" />
+      <Table :table-list="tableList" :table-header="tableHeader" :total-count="totalCount" :total-page="totalPage" :page-index="pageIndex" @isShowDetail1="isShowBuild=true" @prev="prev" @next="next" />
     </el-row>
     <!-- 工单配置弹框 -->
     <repair-order-config :is-show-config="isShowConfig" @closeConfig="isShowConfig=false" />

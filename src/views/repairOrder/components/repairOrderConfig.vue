@@ -56,8 +56,12 @@ export default {
       }
     },
     async handleChange() {
-      await setWarningValue(this.formdata.warningValue)
-      this.closeConfig()
+      try {
+        await setWarningValue(this.formdata.warningValue)
+        this.closeConfig()
+      } catch (e) {
+        console.log(e)
+      }
     }
   }
 

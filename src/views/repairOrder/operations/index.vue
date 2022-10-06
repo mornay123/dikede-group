@@ -8,7 +8,7 @@
         <el-button type="primary" icon="el-icon-circle-plus-outline" class="build" @click="isShowBuild=true">新建</el-button>
       </el-row>
       <!-- 表格 -->
-      <Table :table-list="tableList" :table-header="tableHeader" :total-count="totalCount" :total-page="totalPage" :page-index="pageIndex" @prev="prev" @next="next" />
+      <Table :table-list="tableList" :table-header="tableHeader" :total-count="totalCount" :total-page="totalPage" :page-index="pageIndex" @isshowDetail="isShowBuild=true" @prev="prev" @next="next" />
     </el-row>
     <!-- 新建的弹框 -->
     <add-order :is-show-build="isShowBuild" @closeBuild="isShowBuild=false" />
@@ -87,6 +87,7 @@ export default {
       this.tableList = [...data.currentPageRecords]
       this.tableList = this.tableList.map(item => {
         item.createTime = item.createTime.replace(/T/, ' ')
+        item.updateTime = item.updateTime.replace(/T/, ' ')
         if (item.createType) {
           item.createType = '手动'
         } else {

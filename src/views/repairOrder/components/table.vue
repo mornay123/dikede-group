@@ -40,7 +40,7 @@
       />
     </div>
     <!-- 查看详情弹框 -->
-    <detail :isshow-detail="isShow" :curr-detail-data="currDetailData" @closeDetail="isShow=false" />
+    <detail :isshow-detail="isShow" :curr-detail-data="currDetailData" @isshowDetail="isshowDetail" @isShowDetail1="isShowDetail1" @closeDetail="isShow=false" />
   </div>
 </template>
 
@@ -73,7 +73,8 @@ export default {
   data() {
     return {
       isShow: false,
-      currDetailData: {}
+      currDetailData: {},
+      currStatus: {}
     }
   },
   computed: {
@@ -85,6 +86,13 @@ export default {
     detail(data) {
       this.isShow = true
       this.currDetailData = data
+      // console.log(data)
+    },
+    isshowDetail() {
+      this.$emit('isshowDetail')
+    },
+    isShowDetail1() {
+      this.$emit('isShowDetail1')
     }
   }
 }

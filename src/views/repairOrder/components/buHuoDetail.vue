@@ -7,24 +7,38 @@
     append-to-body
     @close="closeBuHuo"
   >
-    <el-form class="demo-ruleForm form">
-      <el-table :data="buHuoDetailList" height="330px">
-        <el-table-column property="channelCode" label="货道编号" width="92px" />
-        <el-table-column property="sku.brandName" label="商品名称" width="92px" />
-        <el-table-column property="currentCapacity" label="当前数量" width="92px" />
-        <el-table-column property="maxCapacity" label="还可添加" width="92px" />
-        <el-table-column property="maxCapacity" label="补满数量">
-          <!-- <span>货道暂无商品</span> -->
-          <template slot-scope="scoped">
-            <el-input-number v-model="scoped.row" size="small" controls-position="right" :min="1" :max="10" />
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-form>
-    <span slot="footer" class="dialog-footer btn">
-      <el-button class="cancel" @click="closeBuHuo">取 消</el-button>
-      <el-button class="determine" type="primary" @click="confirm">确 定</el-button>
-    </span>
+    <!-- 查看详情 -->
+    <div v-if="showList">
+      <el-form class="demo-ruleForm form">
+        <el-table :data="seeDetailList" height="330px">
+          <el-table-column property="channelCode" label="货道编号" />
+          <el-table-column property="skuName" label="商品" />
+          <el-table-column property="expectCapacity" label="补货数量" />
+        </el-table>
+      </el-form>
+    </div>
+    <!-- 创建 -->
+    <div v-else>
+      <el-form class="demo-ruleForm form">
+        <el-table :data="buHuoDetailList" height="330px">
+          <el-table-column property="channelCode" label="货道编号" width="92px" />
+          <el-table-column :formatter="formatter1" property="sku.brandName" label="商品名称" width="92px" />
+          <el-table-column :formatter="formatter2" property="currentCapacity" label="当前数量" width="92px" />
+          <el-table-column :formatter="formatter3" property="maxCapacity" label="还可添加" width="92px" />
+          <el-table-column label="补满数量">
+            <!-- <span>货道暂无商品</span> -->
+            <template slot-scope="scope">
+              <el-input-number v-if="scope.row.sku" v-model="scope.row.maxCapacity" size="small" controls-position="right" :min="1" :max="10" />
+              <span v-else>货道暂无商品</span>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-form>
+      <div slot="footer" class="dialog-footer btn">
+        <el-button class="cancel" @click="closeBuHuo">取 消</el-button>
+        <el-button class="determine" type="primary" @click="confirm">确 定</el-button>
+      </div>
+    </div>
   </el-dialog>
 </template>
 
@@ -40,6 +54,14 @@ export default {
     innerCode: {
       type: String,
       default: ''
+    },
+    showList: {
+      type: Boolean,
+      default: false
+    },
+    seeDetailList: {
+      type: Array,
+      default: () => { [] }
     }
   },
   data() {
@@ -55,9 +77,36 @@ export default {
     }
   },
   methods: {
+    formatter1(row) {
+      if (row.sku) {
+        return row.sku.brandName
+      } else {
+        return '-'
+      }
+    },
+    formatter2(row) {
+      if (row.sku) {
+        return row.currentCapacity
+      } else {
+        return '-'
+      }
+    },
+    formatter3(row) {
+      if (row.sku) {
+        return row.maxCapacity
+      } else {
+        return '-'
+      }
+    },
     async getBuHuoDetailList() {
-      const { data } = await getBuHuoDetailList(this.innerCode)
-      this.buHuoDetailList = data
+      try {
+        // console.log(this.innerCode)
+        const { data } = await getBuHuoDetailList(this.innerCode)
+        // console.log(data)
+        this.buHuoDetailList = data
+      } catch (e) {
+        console.log(e)
+      }
     },
     closeBuHuo() {
       this.$emit('closeBuHuo')
@@ -82,7 +131,7 @@ export default {
     width: 200px;
   }
   .form{
-    text-align: left;
+    text-align: center;
     height: 330px;
   }
   .el-dialog__header{
