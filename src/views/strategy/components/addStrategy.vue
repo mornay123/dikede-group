@@ -81,6 +81,7 @@ export default {
     async handleChange() {
       if (this.currPolicyId) {
         await editStrategy(this.currPolicyId, this.form)
+        this.$message.success('修改成功')
         this.searchStrategy()
       } else {
         await this.$refs.form.validate()
