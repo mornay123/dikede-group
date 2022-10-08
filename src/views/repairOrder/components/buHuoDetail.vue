@@ -26,9 +26,8 @@
           <el-table-column :formatter="formatter2" property="currentCapacity" label="当前数量" width="92px" />
           <el-table-column :formatter="formatter3" property="maxCapacity" label="还可添加" width="92px" />
           <el-table-column label="补满数量">
-            <!-- <span>货道暂无商品</span> -->
             <template slot-scope="scope">
-              <el-input-number v-if="scope.row.sku" v-model="scope.row.maxCapacity" size="small" controls-position="right" :min="1" :max="10" />
+              <el-input-number v-if="scope.row.sku" v-model="scope.row.maxCapacity" size="small" controls-position="right" :min="1" :max="10" @change="inpnum(scope.row)" />
               <span v-else>货道暂无商品</span>
             </template>
           </el-table-column>
@@ -66,7 +65,15 @@ export default {
   },
   data() {
     return {
-      buHuoDetailList: []
+      buHuoDetailList: [],
+      formdata: [],
+      obj: {
+        channelCode: '',
+        expectCapacity: '',
+        skuId: '',
+        skuImage: '',
+        skuName: ''
+      }
     }
   },
   watch: {
@@ -77,6 +84,13 @@ export default {
     }
   },
   methods: {
+    inpnum(data) {
+      for (let i = 0; i < this.formdata.length; i++) {
+        if (this.formdata[i].channelCode === data.channelCode) {
+          this.formdata[i].expectCapacity = data.maxCapacity
+        }
+      }
+    },
     formatter1(row) {
       if (row.sku) {
         return row.sku.brandName
@@ -100,10 +114,20 @@ export default {
     },
     async getBuHuoDetailList() {
       try {
-        // console.log(this.innerCode)
         const { data } = await getBuHuoDetailList(this.innerCode)
-        // console.log(data)
         this.buHuoDetailList = data
+        console.log(data)
+        for (let i = 0; i < data.length; i++) {
+          if (data[i].sku) {
+            this.obj.channelCode = data[i].channelCode
+            this.obj.expectCapacity = data[i].maxCapacity
+            this.obj.skuId = data[i].skuId
+            this.obj.skuImage = data[i].sku.skuImage
+            this.obj.skuName = data[i].sku.skuName
+            this.formdata.push(this.obj)
+            this.obj = {}
+          }
+        }
       } catch (e) {
         console.log(e)
       }
@@ -112,6 +136,7 @@ export default {
       this.$emit('closeBuHuo')
     },
     async confirm() {
+      this.$emit('details', this.formdata)
       this.closeBuHuo()
     }
   }

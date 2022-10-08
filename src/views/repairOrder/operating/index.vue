@@ -9,7 +9,7 @@
         <el-button class="setting" @click="isShowConfig=true">工单配置</el-button>
       </el-row>
       <!-- 表格 -->
-      <Table :table-list="tableList" :table-header="tableHeader" :total-count="totalCount" :total-page="totalPage" :page-index="pageIndex" @isShowDetail1="isShowBuild=true" @prev="prev" @next="next" />
+      <Table v-loading="loading" :table-list="tableList" :table-header="tableHeader" :total-count="totalCount" :total-page="totalPage" :page-index="pageIndex" @isShowDetail1="isShowBuild=true" @prev="prev" @next="next" />
     </el-row>
     <!-- 工单配置弹框 -->
     <repair-order-config :is-show-config="isShowConfig" @closeConfig="isShowConfig=false" />
@@ -31,6 +31,7 @@ export default {
     return {
       isShowConfig: false,
       isShowBuild: false,
+      loading: false,
       repairOrderStatusList: [],
       tableList: [],
       totalCount: 0,
@@ -70,7 +71,7 @@ export default {
         },
         {
           label: '创建日期',
-          prop: 'createType'
+          prop: 'createTime'
         }
       ]
     }
@@ -89,20 +90,27 @@ export default {
       }
     },
     async getRepairOrderSearchList() {
-      const { data } = await repairOrderSearchList(this.params)
-      this.tableList = [...data.currentPageRecords]
-      this.tableList = this.tableList.map(item => {
-        item.createTime = item.createTime.replace(/T/, ' ')
-        if (item.createType) {
-          item.createType = '手动'
-        } else {
-          item.createType = '自动'
-        }
-        return item
-      })
-      this.totalCount = parseInt(data.totalCount)
-      this.totalPage = parseInt(data.totalPage)
-      this.pageIndex = parseInt(data.pageIndex)
+      try {
+        this.loading = true
+        const { data } = await repairOrderSearchList(this.params)
+        this.tableList = [...data.currentPageRecords]
+        this.tableList = this.tableList.map(item => {
+          item.createTime = item.createTime.replace(/T/, ' ').replace(/-/, '.').replace(/-/, '.')
+          if (item.createType) {
+            item.createType = '手动'
+          } else {
+            item.createType = '自动'
+          }
+          return item
+        })
+        this.totalCount = parseInt(data.totalCount)
+        this.totalPage = parseInt(data.totalPage)
+        this.pageIndex = parseInt(data.pageIndex)
+      } catch (e) {
+        console.log(e)
+      } finally {
+        this.loading = false
+      }
     },
     prev() {
       this.params.pageIndex--

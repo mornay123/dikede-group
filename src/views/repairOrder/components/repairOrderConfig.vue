@@ -58,9 +58,11 @@ export default {
     async handleChange() {
       try {
         await setWarningValue(this.formdata.warningValue)
-        this.closeConfig()
+        this.$message.success('设置成功')
       } catch (e) {
         console.log(e)
+      } finally {
+        this.closeConfig()
       }
     }
   }

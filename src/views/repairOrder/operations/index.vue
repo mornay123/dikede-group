@@ -8,7 +8,7 @@
         <el-button type="primary" icon="el-icon-circle-plus-outline" class="build" @click="isShowBuild=true">新建</el-button>
       </el-row>
       <!-- 表格 -->
-      <Table :table-list="tableList" :table-header="tableHeader" :total-count="totalCount" :total-page="totalPage" :page-index="pageIndex" @isshowDetail="isShowBuild=true" @prev="prev" @next="next" />
+      <Table v-loading="loading" :table-list="tableList" :table-header="tableHeader" :total-count="totalCount" :total-page="totalPage" :page-index="pageIndex" @isshowDetail="isShowBuild=true" @prev="prev" @next="next" />
     </el-row>
     <!-- 新建的弹框 -->
     <add-order :is-show-build="isShowBuild" @closeBuild="isShowBuild=false" />
@@ -30,6 +30,7 @@ export default {
       totalCount: 0,
       totalPage: 0,
       pageIndex: 0,
+      loading: false,
       params: {
         pageIndex: 1,
         pageSize: 10,
@@ -64,7 +65,7 @@ export default {
         },
         {
           label: '创建日期',
-          prop: 'createType'
+          prop: 'createTime'
         }
       ]
     }
@@ -83,21 +84,28 @@ export default {
       }
     },
     async getRepairOrderSearchList() {
-      const { data } = await repairOrderSearchList(this.params)
-      this.tableList = [...data.currentPageRecords]
-      this.tableList = this.tableList.map(item => {
-        item.createTime = item.createTime.replace(/T/, ' ')
-        item.updateTime = item.updateTime.replace(/T/, ' ')
-        if (item.createType) {
-          item.createType = '手动'
-        } else {
-          item.createType = '自动'
-        }
-        return item
-      })
-      this.totalCount = parseInt(data.totalCount)
-      this.totalPage = parseInt(data.totalPage)
-      this.pageIndex = parseInt(data.pageIndex)
+      try {
+        this.loading = true
+        const { data } = await repairOrderSearchList(this.params)
+        this.tableList = [...data.currentPageRecords]
+        this.tableList = this.tableList.map(item => {
+          item.createTime = item.createTime.replace(/T/, ' ').replace(/-/, '.').replace(/-/, '.')
+          item.updateTime = item.updateTime.replace(/T/, ' ').replace(/-/, '.').replace(/-/, '.')
+          if (item.createType) {
+            item.createType = '手动'
+          } else {
+            item.createType = '自动'
+          }
+          return item
+        })
+        this.totalCount = parseInt(data.totalCount)
+        this.totalPage = parseInt(data.totalPage)
+        this.pageIndex = parseInt(data.pageIndex)
+      } catch (e) {
+        console.log(e)
+      } finally {
+        this.loading = false
+      }
     },
     prev() {
       this.params.pageIndex--

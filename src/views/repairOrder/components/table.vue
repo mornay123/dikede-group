@@ -7,14 +7,13 @@
       <el-table-column
         type="index"
         label="序号"
-        width="80"
+        width="50"
       />
       <el-table-column
         v-for="(item,index) in tableHeader"
         :key="index"
         :prop="item.prop"
         :label="item.label"
-        width="132"
       />
       <el-table-column
         label="操作"
@@ -26,10 +25,11 @@
       </el-table-column>
     </el-table>
     <!-- 页码 -->
-    <div v-if="isShowPage" class="page">
+    <div class="page">
       <span>共 {{ totalCount }} 条记录 第 {{ pageIndex }} /
         {{ totalPage }} 页</span>
       <el-pagination
+        :hide-on-single-page="true"
         background
         prev-text="上一页"
         next-text="下一页"
@@ -77,16 +77,11 @@ export default {
       currStatus: {}
     }
   },
-  computed: {
-    isShowPage() {
-      return this.tableList.length >= 10
-    }
-  },
+
   methods: {
     detail(data) {
       this.isShow = true
       this.currDetailData = data
-      // console.log(data)
     },
     isshowDetail() {
       this.$emit('isshowDetail')

@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { getRepairerList, getAllOrderType, createOrder } from '@/api/repairOrder'
+import { getRepairerList, repairOrderSearchList, getAllOrderType, createOrder } from '@/api/repairOrder'
 
 export default {
   props: {
@@ -61,7 +61,9 @@ export default {
         innerCode: '', // 设备编号
         userId: '',
         productType: '',
-        desc: ''
+        desc: '',
+        isRepair: true,
+        assignorId: ''
       },
       ruleForm: {
         innerCode: [{ required: true, message: '请输入' }],
@@ -81,7 +83,6 @@ export default {
       try {
         this.operatorList = []
         const { data } = await getRepairerList(this.formdata.innerCode)
-        console.log(data)
         this.operatorList = data
       } catch (e) {
         console.log(e)
@@ -91,7 +92,6 @@ export default {
       try {
         this.operatorList = []
         const { data } = await getAllOrderType()
-        // console.log(data)
         data.forEach(item => {
           if (item.type === 1) {
             this.allOrderType.push(item)
@@ -103,18 +103,31 @@ export default {
     },
     closeBuild() {
       this.$refs.ruleForm.resetFields()
+      this.formdata = {
+        createType: 1,
+        innerCode: '', // 设备编号
+        userId: '',
+        productType: '',
+        desc: '',
+        isRepair: true,
+        assignorId: ''
+      }
       this.$emit('closeBuild')
     },
     async confirm() {
       try {
         await this.$refs.ruleForm.validate()
+        const { data } = await repairOrderSearchList(this.formdata)
+        this.formdata.assignorId = data.currentPageRecords[0].assignorId
         await createOrder(this.formdata)
         this.$message.success('新建成功')
-        this.closeBuild()
+        this.$parent.getRepairOrderSearchList()
       } catch (e) {
         if (e.response && e.response.status === 500) {
           this.$message.error(e.response.data)
         }
+      } finally {
+        this.closeBuild()
       }
     }
   }

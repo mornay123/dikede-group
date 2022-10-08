@@ -9,7 +9,7 @@
     <el-form ref="ruleForm" class="demo-ruleForm form" :rules="ruleForm" :model="formdata" label-width="140px">
       <el-form-item label="设备编号：" prop="innerCode">
         <el-input
-          v-model="formdata.innerCode"
+          v-model.trim="formdata.innerCode"
           placeholder="请输入"
           maxlength="15"
           show-word-limit
@@ -18,7 +18,7 @@
       </el-form-item>
       <el-form-item label="工单类型：" prop="productType">
         <el-select v-model="formdata.productType" placeholder="请选择">
-          <el-option label="补货工单" value="2" />
+          <el-option label="补货工单" :value="2" />
         </el-select>
       </el-form-item>
       <el-form-item label="补货数量：">
@@ -44,12 +44,12 @@
       <el-button class="determine" type="primary" @click="confirm">确 定</el-button>
     </span>
     <!-- 补货详情的弹窗 -->
-    <bu-huo-detail :inner-code="formdata.innerCode" :is-show-bu-huo="isShowBuHuo" @closeBuHuo="isShowBuHuo=false" />
+    <bu-huo-detail :inner-code="formdata.innerCode" :is-show-bu-huo="isShowBuHuo" @details="details=$event" @closeBuHuo="isShowBuHuo=false" />
   </el-dialog>
 </template>
 
 <script>
-import { getOperatorList } from '@/api/repairOrder'
+import { getOperatorList, repairOrderSearchList, createOrder } from '@/api/repairOrder'
 import buHuoDetail from './buHuoDetail.vue'
 
 export default {
@@ -69,8 +69,10 @@ export default {
         userId: '',
         productType: '',
         desc: '',
-        details: []
+        isRepair: false,
+        assignorId: ''
       },
+      details: [],
       ruleForm: {
         innerCode: [{ required: true, message: '请输入' }],
         productType: [{ required: true, message: '请输入' }],
@@ -97,11 +99,34 @@ export default {
     },
     closeBuild() {
       this.$refs.ruleForm.resetFields()
+      this.formdata = {
+        createType: 1,
+        innerCode: '', // 设备编号
+        userId: '',
+        productType: '',
+        desc: '',
+        isRepair: false,
+        assignorId: ''
+      }
+      this.details = []
       this.$emit('closeBuild')
     },
     async confirm() {
-      await this.$refs.ruleForm.validate()
-      this.closeBuild()
+      try {
+        await this.$refs.ruleForm.validate()
+        const { data } = await repairOrderSearchList(this.formdata)
+        this.formdata.assignorId = data.currentPageRecords[0].assignorId
+        this.formdata.details = this.details
+        await createOrder(this.formdata)
+        this.$message.success('新建成功')
+        this.$parent.getRepairOrderSearchList()
+      } catch (e) {
+        if (e.response && e.response.status === 500) {
+          this.$message.error(e.response.data)
+        }
+      } finally {
+        this.closeBuild()
+      }
     }
   }
 
