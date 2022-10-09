@@ -116,7 +116,6 @@ export default {
       try {
         const { data } = await getBuHuoDetailList(this.innerCode)
         this.buHuoDetailList = data
-        console.log(data)
         for (let i = 0; i < data.length; i++) {
           if (data[i].sku) {
             this.obj.channelCode = data[i].channelCode

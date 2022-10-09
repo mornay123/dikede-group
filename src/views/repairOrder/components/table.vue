@@ -40,7 +40,7 @@
       />
     </div>
     <!-- 查看详情弹框 -->
-    <detail :isshow-detail="isShow" :curr-detail-data="currDetailData" @isshowDetail="isshowDetail" @isShowDetail1="isShowDetail1" @closeDetail="isShow=false" />
+    <detail v-if="isShow" :isshow-detail="isShow" :curr-detail-data="currDetailData" @isshowDetail="isshowDetail" @isShowDetail1="isShowDetail1" @closeDetail="isShow=false" />
   </div>
 </template>
 
