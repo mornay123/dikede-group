@@ -1,0 +1,137 @@
+<template>
+  <div class="my_table">
+    <el-table
+      :data="tableList"
+      style="width: 100%"
+    >
+      <el-table-column
+        type="index"
+        label="序号"
+        width="50"
+      />
+      <el-table-column
+        v-for="(item,index) in tableHeader"
+        :key="index"
+        :prop="item.prop"
+        :label="item.label"
+      />
+      <el-table-column
+        label="操作"
+        width="100"
+      >
+        <template slot-scope="scope">
+          <el-button type="text" size="large" @click="detail(scope.row)">查看详情</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- 页码 -->
+    <div class="page">
+      <span>共 {{ totalCount }} 条记录 第 {{ pageIndex }} /
+        {{ totalPage }} 页</span>
+      <el-pagination
+        :hide-on-single-page="true"
+        background
+        prev-text="上一页"
+        next-text="下一页"
+        layout="prev, next"
+        :total="totalCount"
+        @prev-click="$emit('prev',pageIndex)"
+        @next-click="$emit('next',pageIndex)"
+      />
+    </div>
+    <!-- 查看详情弹框 -->
+    <detail v-if="isShow" :isshow-detail="isShow" :curr-detail-data="currDetailData" @isshowDetail="isshowDetail" @isShowDetail1="isShowDetail1" @closeDetail="isShow=false" />
+  </div>
+</template>
+
+<script>
+import detail from './detail.vue'
+export default {
+  components: { detail },
+  props: {
+    tableList: {
+      type: Array,
+      default: () => { [] }
+    },
+    tableHeader: {
+      type: Array,
+      default: () => { [] }
+    },
+    totalCount: {
+      type: Number,
+      default: 0
+    },
+    totalPage: {
+      type: Number,
+      default: 0
+    },
+    pageIndex: {
+      type: Number,
+      default: 0
+    }
+  },
+  data() {
+    return {
+      isShow: false,
+      currDetailData: {},
+      currStatus: {}
+    }
+  },
+
+  methods: {
+    detail(data) {
+      this.isShow = true
+      this.currDetailData = data
+    },
+    isshowDetail() {
+      this.$emit('isshowDetail')
+    },
+    isShowDetail1() {
+      this.$emit('isShowDetail1')
+    }
+  }
+}
+</script>
+
+<style lang="scss">
+.my_table{
+  .el-table td, .el-table th.is-leaf {
+    border-bottom: none !important;
+  }
+  .has-gutter th{
+      line-height: 1.15;
+      padding: 10px 0px 9px;
+      background: rgb(243, 246, 251);
+      font-weight: 500;
+      text-align: left;
+      color: rgb(102, 102, 102)
+  }
+  .el-table::before{
+    height: 0;
+  }
+  .page{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100px;
+  padding: 32px 16px;
+  color: #dbdfe5;
+  font-size: 16px;
+  .btn-next{
+    width: 70px;
+    height: 32px;
+    margin: 0 16px;
+    border-radius: 2px;
+    // color: #C0C4CC;
+  }
+  .btn-prev{
+    width: 70px;
+    height: 32px;
+    margin: 0 16px;
+    border-radius: 2px;
+    // color: #C0C4CC;
+  }
+}
+}
+</style>
