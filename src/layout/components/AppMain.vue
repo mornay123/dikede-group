@@ -24,11 +24,7 @@ export default {
   width: 100%;
   position: relative;
   overflow: hidden;
-<<<<<<< HEAD
   margin-top: 60px;
-=======
-    margin-top: 60px;
->>>>>>> feature/repairOrder
   padding: 20px;
 }
 .fixed-header+.app-main {
