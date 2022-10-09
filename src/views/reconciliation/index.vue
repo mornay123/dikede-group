@@ -1,10 +1,13 @@
 <template>
-  <div>区域</div>
+  <div>
+    <AccountStats />
+  </div>
 </template>
 
 <script>
+import AccountStats from './AccountStats'
 export default {
-
+  components: { AccountStats }
 }
 </script>
 

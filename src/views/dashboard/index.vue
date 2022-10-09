@@ -96,12 +96,12 @@ export default {
     await this.getWorkOrderInfo()
   },
   methods: {
-    async getWorkOrderInfo() {
+    async getWorkOrderInfo() { // 获取当时工单汇总信息(人员统计头部信息)
       const { data } = await getWorkOrderInfoAPI(this.start + ' 00:00:00', this.end + ' 23:59:59')
       console.log(data)
       this.workOrder = data
     },
-    async getSales() {
+    async getSales() { // 获取一定时间范围之内的订单总数
       const { data } = await getSalesAPI(this.start + ' 00:00:00', this.end + ' 23:59:59')
       this.orderTotal = data
       const res = await getOrderAmountAPI(this.start + ' 00:00:00', this.end + ' 23:59:59')
