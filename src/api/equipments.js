@@ -107,3 +107,14 @@ export const getMachineTypeAPI = (params) => {
     params
   })
 }
+/**
+ * 获取货道详情
+ * @param {*} innerCode // 机器编号
+ * @returns
+ */
+export const getCargoLanesAPI = (innerCode) => {
+  return request(`vm-service/channel/channelList/${innerCode}`)
+}
+export const getTypeAPI = (typeId) => {
+  return request(`vm-service/vmType/${typeId}`)
+}

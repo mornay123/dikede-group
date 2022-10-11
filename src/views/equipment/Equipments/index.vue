@@ -69,9 +69,18 @@
           <el-table-column label="操作" width="300">
 
             <template slot-scope="scope">
-              <el-button class="actionBtn" type="text" size="small">货道</el-button>
+              <el-button :loading="loading" class="actionBtn" type="text" size="small" @click="isAisle(scope.$index, scope.row)">货道</el-button>
               <el-button :loading="loading" class="actionBtn" type="text" size="small" @click="isEdit(scope.$index, scope.row)">策略</el-button>
-              <el-button class="actionBtn" type="text" size="small" @click="isAlters">修改</el-button>
+              <el-button class="actionBtn" type="text" size="small" @click="isAlters">修改]k </el-button>
+              <!-- 货道 -->
+              <!-- :dialog-visible.sync="dialogVisible" -->
+              <!-- :cargolist="CargoList" -->
+              <cargo-lanes
+                :node-detail="scope.row"
+                :is-visible.sync="isVisible"
+              />
+              <!-- :typeinfo="TypeInfo" -->
+
               <!-- 策略 -->
               <Activity
                 :show-dialog-activity.sync="showDialogActivity"
@@ -108,13 +117,15 @@ import Search from '../components/search.vue'
 import AddDevice from './components/AddDevice.vue'
 import Activity from './components/Activity.vue'
 import Alter from './components/Alter.vue'
+import CargoLanes from './components/CargoLanes.vue'
 import { getEquipmentsAPI, getActivityList, inquireAboutDiscounts } from '@/api/equipments'
 export default {
   components: {
     Search,
     AddDevice,
     Alter,
-    Activity
+    Activity,
+    CargoLanes
   },
   data() {
     return {
@@ -131,7 +142,10 @@ export default {
       totalPage: '', // 总共几页
       loading: false, // 加载框
       showDialog: false, // 新增显示框
-      isAlter: false, // 新增显示框
+      isAlter: false, // 新增显示框,
+      isVisible: false, // 是否显示货道
+
+      TypeInfo: {},
       node: [],
       showDialogActivity: false,
       activityList: [],
@@ -216,7 +230,7 @@ export default {
       this.loading = true
       try {
         const { data } = await inquireAboutDiscounts(e.innerCode)
-
+        console.log(data)
         if (data === '') {
           this.quireAboutDiscount = false
         } else {
@@ -232,9 +246,13 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+    // 货道点击按钮
+    async isAisle(q, e) {
+      this.isVisible = true
     }
-
   }
+
 }
 
 </script>

@@ -114,6 +114,7 @@ export default {
 <style >
 .box{
     width: 100%;
+ /* background-color: red; */
     padding: 10px 60px;
     display: flex;
     justify-content: space-between;
